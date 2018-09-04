@@ -316,10 +316,10 @@ def reportSentiments(all_entries):
     Returns:
         None
     """
-    # reportOverallSentiment(all_entries)
-    # reportYearlySentiments(all_entries)
+    reportOverallSentiment(all_entries)
+    reportYearlySentiments(all_entries)
     reportMonthlySentiments(all_entries)
-    # reportTop5Sentiments(all_entries)
+    reportTop5Sentiments(all_entries)
     # reportPosNegSentiments(all_entries)
 
 ###############################   SENTIMENT   #################################

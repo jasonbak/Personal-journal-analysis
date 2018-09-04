@@ -171,7 +171,10 @@ def processMD(raw_md):
             'June':30, 'July':31, 'August':31, 'September':30, 'October':31,
             'November':30, 'December':31}
     new_month = '# '
-    new_day = '## **'
+    # NOTE: Provides backwards compatability with non-bolded titles for current
+    # journal (Updated: Sep 2, 2018)
+    old_new_day = '## **'
+    new_day = "## "
     # Split all raw entries by \n
     split_entries = raw_md.splitlines()
 
@@ -188,6 +191,11 @@ def processMD(raw_md):
         # handles emojis
         # NTLK Vader doesn't consider emojis, but it does consider emoticons
         line = replaceEmojis(line)
+
+        # For backwards compatability with old journal (non-bolded) title format
+        if line[:len(old_new_day)] == old_new_day:
+            line = line[:len(new_day)] + line[len(old_new_day):]
+
         if line[:len(new_month)] == new_month and entries_of_month != []:
             month = line[len(new_month):]
             # Nothing in entries_of_month when we start processing the year
@@ -256,51 +264,32 @@ def processJournals():
     """
     journal_2014 = 'data/2014.txt'
     journal_2015 = 'data/2015.txt'
-    # journal_2016 = 'data/2016.txt'
-    # journal_2017 = 'data/2017.tex'
-    # journal_2018 = 'data/2018.md'
+    journal_2016 = 'data/2016.txt'
+    journal_2017 = 'data/2017.tex'
+    journal_2018 = 'data/2018.md'
 
     all_entries = []
     all_titles = []
 
+    with open(journal_2014) as f14, open(journal_2015) as f15, \
+            open(journal_2016) as f16, open(journal_2017) as f17, \
+            open(journal_2018) as f18:
+        # Process .txt files from 2014, 2015, and 2016
+        raw_txt_entries_of_years = f14.read(), f15.read(), f16.read()
 
-
-    # TODO: Remove this block of code when using real data set
-    title_2014 = [['nothing'], ['in', 'here', 'because', 'of', 'pruned', 'data']]
-    title_2015 = [['rip', ':(']]
-    all_titles.append(title_2014)
-    all_titles.append(title_2015)
-    # Default mode == 'r'
-    with open(journal_2014) as f14, open(journal_2015) as f15:
-        # Process .txt files from 2014, 2015
-        raw_txt_entries_of_years = f14.read(), f15.read()
         for raw_txt_entries_of_year in raw_txt_entries_of_years:
             # Gets 3d list of entries
             entries_year = processTXT(raw_txt_entries_of_year)
             all_entries.append(entries_year)
 
+        # Process .tex file from 2017
+        entries_2017, titles_2017 = processTEX(f17.read())
+        all_entries.append(entries_2017)
+        all_titles.append(titles_2017)
 
-
-
-    # with open(journal_2014) as f14, open(journal_2015) as f15, \
-            # open(journal_2016) as f16, open(journal_2017) as f17, \
-            # open(journal_2018) as f18:
-        # # Process .txt files from 2014, 2015, and 2016
-        # raw_txt_entries_of_years = f14.read(), f15.read(), f16.read()
-
-        # for raw_txt_entries_of_year in raw_txt_entries_of_years:
-            # # Gets 3d list of entries
-            # entries_year = processTXT(raw_txt_entries_of_year)
-            # all_entries.append(entries_year)
-
-        # # Process .tex file from 2017
-        # entries_2017, titles_2017 = processTEX(f17.read())
-        # all_entries.append(entries_2017)
-        # all_titles.append(titles_2017)
-
-        # # Process .md file from 2018
-        # entries_2018, titles_2018 = processMD(f18.read())
-        # all_entries.append(entries_2018)
-        # all_titles.append(titles_2018)
+        # Process .md file from 2018
+        entries_2018, titles_2018 = processMD(f18.read())
+        all_entries.append(entries_2018)
+        all_titles.append(titles_2018)
 
     return all_entries, all_titles
